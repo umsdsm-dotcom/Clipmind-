@@ -30,7 +30,7 @@ async def photo(update: Update, context: ContextTypes.DEFAULT_TYPE):
         image_bytes = image_file.read()
 
     response = client.models.generate_content(
-        model="gemini-1.5-flash",
+        model="gemini-2.5-flash",
         contents=[
             "Проанализируй это фото товара. "
             "Создай идею короткого рекламного видео для Instagram/TikTok.",
