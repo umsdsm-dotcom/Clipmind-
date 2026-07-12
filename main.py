@@ -1,15 +1,14 @@
 import os
-import google.generativeai as genai
+from google import genai
 
 from telegram import Update
 from telegram.ext import Application, CommandHandler, MessageHandler, ContextTypes, filters
 
+
 BOT_TOKEN = os.getenv("BOT_TOKEN")
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 
-genai.configure(api_key=GEMINI_API_KEY)
-
-model = genai.GenerativeModel("gemini-1.5-flash")
+client = genai.Client(api_key=GEMINI_API_KEY)
 
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -27,15 +26,19 @@ async def photo(update: Update, context: ContextTypes.DEFAULT_TYPE):
     file_path = "photo.jpg"
     await photo_file.download_to_drive(file_path)
 
-    image = open(file_path, "rb").read()
+    with open(file_path, "rb") as image_file:
+        image_bytes = image_file.read()
 
-    response = model.generate_content(
-        [
+    response = client.models.generate_content(
+        model="gemini-1.5-flash",
+        contents=[
             "Проанализируй это фото товара. "
-            "Придумай идею короткого рекламного видео для социальных сетей.",
+            "Создай идею короткого рекламного видео для Instagram/TikTok.",
             {
-                "mime_type": "image/jpeg",
-                "data": image
+                "inline_data": {
+                    "mime_type": "image/jpeg",
+                    "data": image_bytes
+                }
             }
         ]
     )
